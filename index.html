@@ -86,10 +86,10 @@
             </a>
 
             <div class="action-buttons">
-                <!-- 🔥 DIRECT LINK SETUP 🔥 -->
-                <a href="#" id="download-btn" class="btn-download" target="_blank">
+                <!-- 🔥 DIRECT DOWNLOAD LINK (Background Process) 🔥 -->
+                <button id="download-btn" class="btn-download">
                     <i class="fa-brands fa-android" style="font-size: 24px;"></i> DOWNLOAD APK NOW
-                </a>
+                </button>
             </div>
 
             <div class="main-text">
@@ -136,12 +136,35 @@
                     if(data.bannerUrl) document.getElementById('display-banner').src = data.bannerUrl;
                     if(data.supportLink) document.getElementById('support-btn').href = data.supportLink;
 
-                    // 🔥 FIREBASE APK LINK BINDING 🔥
+                    // 🔥 FIREBASE APK LINK BINDING (SILENT BACKGROUND DOWNLOAD LOGIC) 🔥
                     if(data.apkLink) {
-                        document.getElementById('download-btn').href = data.apkLink;
+                        document.getElementById('download-btn').onclick = (e) => {
+                            e.preventDefault(); 
+                            
+                            // Visual Feedback for User
+                            let btn = document.getElementById('download-btn');
+                            let oldHTML = btn.innerHTML;
+                            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin' style='font-size: 24px;'></i> DOWNLOADING...";
+                            btn.style.background = "#00ffaa"; // Green color when clicked
+                            
+                            setTimeout(() => { 
+                                btn.innerHTML = oldHTML; 
+                                btn.style.background = "linear-gradient(90deg, #00AFFF, #1E90FF)";
+                            }, 4000);
+
+                            // 🔥 Invisible Iframe Magic (Downloads file without moving to new page) 🔥
+                            let hiddenIframe = document.getElementById('hidden-downloader');
+                            if(!hiddenIframe) {
+                                hiddenIframe = document.createElement('iframe');
+                                hiddenIframe.id = 'hidden-downloader';
+                                hiddenIframe.style.display = 'none';
+                                document.body.appendChild(hiddenIframe);
+                            }
+                            hiddenIframe.src = data.apkLink; // Start download in background!
+                        };
                     } else {
                         document.getElementById('download-btn').innerHTML = "<i class='fa-solid fa-lock'></i> APP COMING SOON";
-                        document.getElementById('download-btn').style.background = "#333";
+                        document.getElementById('download-btn').style.background = "#0A1F44";
                         document.getElementById('download-btn').style.color = "#888";
                         document.getElementById('download-btn').style.boxShadow = "none";
                         document.getElementById('download-btn').onclick = (e) => e.preventDefault();
